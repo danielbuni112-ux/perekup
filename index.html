@@ -53,8 +53,8 @@ main .wrap{padding-block:16px;display:flex;flex-direction:column;gap:14px}
 /* Tab bar */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:rgba(12,13,15,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
-.tabs .row{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-.tab{border:0;background:none;padding:9px 4px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px;font-weight:500}
+.tabs .row{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.tab{border:0;background:none;padding:9px 2px 10px;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:11px;font-weight:500}
 .tab svg{width:23px;height:23px}
 .tab[aria-current="page"]{color:var(--ink)}
 .fab{position:fixed;z-index:26;right:max(18px,calc(env(safe-area-inset-right,0px) + 18px));bottom:calc(76px + env(safe-area-inset-bottom,0px));
@@ -173,6 +173,16 @@ main .wrap{padding-block:16px;display:flex;flex-direction:column;gap:14px}
 .vin{font-family:var(--mono);font-size:13px;letter-spacing:.06em}
 .desc{white-space:pre-wrap;overflow-wrap:anywhere}
 
+/* Catalog */
+.filters{display:flex;flex-direction:column;gap:10px;background:var(--surface);border-radius:var(--r);padding:12px}
+.filters .grid2 input,.filters .grid2 select{width:100%;border:0;background:var(--sunk);border-radius:10px;padding:10px 12px;min-height:44px;font-size:16px;min-width:0}
+.frow{display:flex;gap:8px;align-items:center}
+.frow .search{flex:1;min-width:0}
+.fbtn{flex:none;border:0;background:var(--sunk);color:var(--ink);border-radius:12px;height:46px;padding:0 14px;font-weight:500;font-size:14px}
+.fbtn[aria-expanded="true"]{background:#2a2d33}
+.fbtn .dot{display:inline-block;min-width:18px;height:18px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:11px;line-height:18px;margin-left:6px;font-family:var(--mono)}
+.count{font-size:13px;color:var(--muted)}
+.more{align-self:center}
 /* People */
 .person{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:10px 0}
 .ava{width:44px;height:44px;border-radius:50%;background:var(--sunk);color:var(--ink);display:grid;place-items:center;font:500 17px var(--display);flex:none}
@@ -250,6 +260,7 @@ const I = {
   garage:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V9l9-5 9 5v12"/><path d="M7 21v-6h10v6"/><path d="M7 18h10"/></svg>',
   feed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg>',
   people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5 6.5-5s5.7 1.6 6.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.3 0 4 1.2 4.5 3.5"/></svg>',
+  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M20 20l-5-5"/><path d="M8 10.5h5"/></svg>',
   me:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l4-5 3 3 5-6"/></svg>',
   plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
@@ -259,7 +270,7 @@ const I = {
   lock:'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
 };
 
-const S = { user:null, me:null, tab:"garage", filter:"in_stock", feedMode:"follow", cars:[], following:new Set() };
+const S = { user:null, me:null, tab:"garage", filter:"in_stock", cars:[], following:new Set(), cat:{ q:"", min:"", max:"", year:"", city:"", sort:"new", sold:false }, catOpen:false };
 
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(t._h); t._h=setTimeout(()=>t.hidden=true,2400); }
 function fail(e){ console.error(e); toast(e?.message ? "Ошибка: " + e.message : "Что-то пошло не так, попробуй ещё раз"); }
@@ -410,7 +421,7 @@ function renderAuth(mode="login", err=""){
 }
 
 // ---------- shell ----------
-const TABS = [["garage","Гараж",I.garage],["feed","Лента",I.feed],["people","Люди",I.people],["me","Итоги",I.me]];
+const TABS = [["garage","Гараж",I.garage],["catalog","Каталог",I.grid],["feed","Лента",I.feed],["people","Люди",I.people],["me","Итоги",I.me]];
 function renderShell(){
   $("#app").innerHTML = `
     <header class="topbar"><div class="wrap"><h1 id="title"></h1><span id="topAct"></span></div></header>
@@ -426,7 +437,7 @@ function renderTab(){
   document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-current", b.dataset.tab===S.tab ? "page" : "false"));
   $("#fab").hidden = S.tab !== "garage";
   $("#topAct").innerHTML = "";
-  ({garage:viewGarage, feed:viewFeed, people:viewPeople, me:viewMe})[S.tab]();
+  ({garage:viewGarage, catalog:viewCatalog, feed:viewFeed, people:viewPeople, me:viewMe})[S.tab]();
 }
 
 async function loadMyCars(){
@@ -448,7 +459,7 @@ function carCard(car, opts={}){
   return `<button class="car" data-id="${car.id}">
     <div class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : I.car}</div>
     <div class="body">
-      ${opts.who ? `<span class="who">@${esc(car.profiles?.username)}</span>` : ""}
+      ${opts.who ? `<span class="who">@${esc(car.profiles?.username)}${car.city ? " · " + esc(car.city) : ""}</span>` : ""}
       <span class="t">${esc(car.make)} ${esc(car.model)}</span>
       <span class="s">${esc(spec) || "&nbsp;"}</span>${repSum ? `<span class="s">Ремонт и вложения: <span class="num">${short(repSum)}</span></span>` : ""}
       <div class="foot">
@@ -496,21 +507,82 @@ async function viewFeed(){
   $("#title").textContent = "Лента";
   const v = $("#view");
   v.innerHTML = `
-    <div class="toggle"><button data-m="follow" aria-pressed="${S.feedMode==="follow"}">Подписки</button><button data-m="all" aria-pressed="${S.feedMode==="all"}">Все публичные</button></div>
     <div id="fl" style="display:flex;flex-direction:column"><div class="loading">Загрузка…</div></div>`;
-  v.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { S.feedMode = b.dataset.m; viewFeed(); });
-  let q = sb.from("cars").select("*, profiles(username,display_name)").eq("visibility","public").neq("owner_id", S.user.id).order("created_at",{ascending:false}).limit(60);
-  if (S.feedMode === "follow") {
-    if (!S.following.size) { $("#fl").innerHTML = `<div class="empty"><b>Ты ни на кого не подписан</b>Найди перекупов во вкладке «Люди» — их публичные машины появятся здесь.<button class="btn small" id="goPeople">Найти людей</button></div>`; $("#goPeople").onclick=()=>{S.tab="people";renderTab();}; return; }
-    q = q.in("owner_id", [...S.following]);
-  }
+  if (!S.following.size) { $("#fl").innerHTML = `<div class="empty"><b>Ты ни на кого не подписан</b>Здесь появляются машины перекупов, на которых ты подписан. Найди их в каталоге или во вкладке «Люди».<button class="btn small" id="goCat">Открыть каталог</button></div>`; $("#goCat").onclick=()=>{S.tab="catalog";renderTab();}; return; }
+  const q = sb.from("cars").select("*, profiles(username,display_name)").eq("visibility","public").in("owner_id", [...S.following]).order("created_at",{ascending:false}).limit(60);
   const rid = S.rid;
   const { data, error } = await q;
   if (rid !== S.rid || !$("#fl")) return;
   if (error) return fail(error);
-  $("#fl").innerHTML = data.length ? data.map(c=>carCard(c,{who:true})).join("") : `<div class="empty"><b>Пока нет машин</b>${S.feedMode==="follow" ? "Те, на кого ты подписан, ещё ничего не опубликовали." : "Никто ещё не опубликовал машины."}</div>`;
+  $("#fl").innerHTML = data.length ? data.map(c=>carCard(c,{who:true})).join("") : `<div class="empty"><b>Пока нет машин</b>Те, на кого ты подписан, ещё ничего не опубликовали.</div>`;
   $("#fl").querySelectorAll(".car").forEach(b => b.onclick = () => openCar(b.dataset.id));
 }
+
+// ---------- Catalog ----------
+const PAGE = 30;
+async function viewCatalog(){
+  $("#title").textContent = "Каталог";
+  const f = S.cat;
+  const active = ["min","max","year","city"].filter(k => f[k]).length + (f.sold ? 1 : 0) + (f.sort !== "new" ? 1 : 0);
+  const v = $("#view");
+  v.innerHTML = `
+    <div class="frow">
+      <div class="search">${I.search}<input id="cq" type="search" placeholder="Марка или модель" value="${esc(f.q)}" autocomplete="off"></div>
+      <button class="fbtn" id="fToggle" aria-expanded="${S.catOpen}">Фильтры${active ? `<span class="dot">${active}</span>` : ""}</button>
+    </div>
+    <form class="filters" id="fPanel" ${S.catOpen ? "" : "hidden"}>
+      <div class="grid2"><input id="f_min" class="num" inputmode="numeric" placeholder="Цена от, ₽" value="${esc(f.min)}"><input id="f_max" class="num" inputmode="numeric" placeholder="до, ₽" value="${esc(f.max)}"></div>
+      <div class="grid2"><input id="f_year" class="num" inputmode="numeric" placeholder="Год от" value="${esc(f.year)}"><input id="f_city" placeholder="Город" value="${esc(f.city)}"></div>
+      <div class="grid2"><select id="f_sort" aria-label="Сортировка">
+          <option value="new" ${f.sort==="new"?"selected":""}>Новые</option>
+          <option value="cheap" ${f.sort==="cheap"?"selected":""}>Дешевле</option>
+          <option value="dear" ${f.sort==="dear"?"selected":""}>Дороже</option>
+          <option value="year" ${f.sort==="year"?"selected":""}>Год новее</option>
+        </select>
+        <select id="f_sold" aria-label="Статус"><option value="0" ${!f.sold?"selected":""}>В продаже</option><option value="1" ${f.sold?"selected":""}>Все, с проданными</option></select></div>
+      <div class="row-actions"><button type="button" class="btn small ghost" id="fReset">Сбросить</button><button class="btn small">Показать</button></div>
+    </form>
+    <div class="count" id="cCount"></div>
+    <div id="cl" style="display:flex;flex-direction:column"><div class="loading">Загрузка…</div></div>`;
+  $("#fToggle").onclick = () => { S.catOpen = !S.catOpen; $("#fPanel").hidden = !S.catOpen; $("#fToggle").setAttribute("aria-expanded", S.catOpen); };
+  $("#fPanel").onsubmit = e => { e.preventDefault();
+    Object.assign(S.cat, { min:$("#f_min").value.replace(/\D/g,""), max:$("#f_max").value.replace(/\D/g,""), year:$("#f_year").value.replace(/\D/g,""), city:$("#f_city").value.trim(), sort:$("#f_sort").value, sold:$("#f_sold").value==="1" });
+    S.catOpen = false; viewCatalog(); };
+  $("#fReset").onclick = () => { S.cat = { q:S.cat.q, min:"", max:"", year:"", city:"", sort:"new", sold:false }; viewCatalog(); };
+  let t; $("#cq").oninput = () => { clearTimeout(t); t = setTimeout(() => { S.cat.q = $("#cq").value.trim(); loadCatalog(0); }, 300); };
+  loadCatalog(0);
+}
+
+async function loadCatalog(offset){
+  const f = S.cat, rid = S.rid;
+  let q = sb.from("cars").select("*, profiles(username,display_name,city)", { count:"exact" }).eq("visibility","public");
+  if (!f.sold) q = q.neq("status","sold");
+  const words = f.q.replace(/[%,()*]/g," ").split(/\s+/).filter(Boolean).slice(0,3);
+  if (words.length) { const parts = words.map(w => `or(make.ilike.*${w}*,model.ilike.*${w}*)`); q = q.or(parts.length === 1 ? parts[0].slice(3,-1) : `and(${parts.join(",")})`); }
+  if (f.min) q = q.gte("list_price", Number(f.min));
+  if (f.max) q = q.lte("list_price", Number(f.max));
+  if (f.year) q = q.gte("year", Number(f.year));
+  if (f.city) q = q.ilike("city", `%${f.city.replace(/[%,()*]/g,"")}%`);
+  q = f.sort==="cheap" ? q.order("list_price",{ascending:true,nullsFirst:false})
+    : f.sort==="dear" ? q.order("list_price",{ascending:false,nullsFirst:false})
+    : f.sort==="year" ? q.order("year",{ascending:false,nullsFirst:false})
+    : q.order("created_at",{ascending:false});
+  const { data, error, count } = await q.range(offset, offset + PAGE - 1);
+  if (rid !== S.rid || !$("#cl")) return;
+  if (error) return fail(error);
+  const box = $("#cl");
+  if (offset === 0) box.innerHTML = "";
+  box.querySelector(".more")?.remove();
+  $("#cCount").textContent = count ? `${count} ${plural(count,["машина","машины","машин"])}` : "";
+  if (!count) { box.innerHTML = `<div class="empty"><b>Ничего не нашли</b>${f.q || f.min || f.max || f.year || f.city ? "Попробуй смягчить фильтры." : "Пока никто не опубликовал машины. Сделай свою машину публичной — она появится здесь первой."}</div>`; return; }
+  box.insertAdjacentHTML("beforeend", data.map(c => carCard(c, { who:true, mine: c.owner_id === S.user.id })).join(""));
+  if (offset + data.length < count) {
+    box.insertAdjacentHTML("beforeend", `<button class="btn small ghost more" id="cMore">Показать ещё</button>`);
+    $("#cMore").onclick = () => loadCatalog(offset + PAGE);
+  }
+  box.querySelectorAll(".car").forEach(b => b.onclick = () => openCar(b.dataset.id));
+}
+function plural(n, f){ const a = n % 100, b = n % 10; return a > 10 && a < 20 ? f[2] : b === 1 ? f[0] : b >= 2 && b <= 4 ? f[1] : f[2]; }
 
 // ---------- People ----------
 async function viewPeople(){
@@ -659,14 +731,14 @@ function mountRepairs(root, exps, { onAdd, onDel }){
 // ---------- Car detail ----------
 async function openCar(id){
   openSheet(`<div class="loading">Загрузка…</div>`);
-  const { data:car, error } = await sb.from("cars").select("*, profiles(id,username,display_name,city), car_finance(*), car_expenses(*)").eq("id", id).single();
+  const { data:car, error } = await sb.from("cars").select("*, profiles(id,username,display_name,city,tg_username), car_finance(*), car_expenses(*)").eq("id", id).single();
   if (error) { closeSheet(); return fail(error); }
   renderCar(car, car.owner_id === S.user.id);
 }
 
 function renderCar(car, own){
   const c = own ? calc(car) : null;
-  const specs = [["Год",car.year],["Пробег",car.mileage!=null?Number(car.mileage).toLocaleString("ru-RU")+" км":null],["Двигатель",car.engine],["КПП",car.transmission],["Привод",car.drive],["Кузов",car.body],["Цвет",car.color]].filter(x=>x[1]);
+  const specs = [["Город",car.city],["Год",car.year],["Пробег",car.mileage!=null?Number(car.mileage).toLocaleString("ru-RU")+" км":null],["Двигатель",car.engine],["КПП",car.transmission],["Привод",car.drive],["Кузов",car.body],["Цвет",car.color]].filter(x=>x[1]);
   const photos = car.photos || [];
   const exps = c ? [...c.exps].sort((a,b)=>(a.spent_at||"").localeCompare(b.spent_at||"")) : [];
   openSheet(`
@@ -701,7 +773,8 @@ function renderCar(car, own){
     ` : `
     <section class="sect"><div class="ph-head" style="gap:10px"><div class="ava" style="width:44px;height:44px;font-size:17px;border-radius:12px">${esc(initial(car.profiles))}</div>
       <div style="flex:1;min-width:0"><b>${esc(car.profiles?.display_name||car.profiles?.username)}</b><div class="u">@${esc(car.profiles?.username)}</div></div>
-      <button class="btn small ${S.following.has(car.owner_id)?"ghost":""}" id="flw">${S.following.has(car.owner_id)?"Вы подписаны":"Подписаться"}</button></div></section>`}
+      <button class="btn small ${S.following.has(car.owner_id)?"ghost":""}" id="flw">${S.following.has(car.owner_id)?"Вы подписаны":"Подписаться"}</button></div>
+      ${car.profiles?.tg_username ? `<button class="btn" id="contact" style="width:100%">Написать продавцу в Telegram</button>` : `<p class="hint" style="margin:0">Продавец не указал Telegram для связи.</p>`}</section>`}
   </div>`);
   if (own) {
     $("#editCar").onclick = () => openEditor(car);
@@ -732,6 +805,14 @@ function renderCar(car, own){
     };
   } else {
     $("#flw").onclick = async () => { await toggleFollow(car.owner_id); renderCar(car, false); };
+    const ct = $("#contact");
+    if (ct) ct.onclick = () => {
+      const url = `https://t.me/${car.profiles.tg_username}`;
+      const text = `Здравствуйте! Пишу по ${car.make} ${car.model}${car.year ? " " + car.year : ""} из Перекупа (${money(car.list_price)}).`;
+      try { navigator.clipboard?.writeText(text); } catch {}
+      if (IN_TG) TG.openTelegramLink(url); else window.open(url, "_blank");
+      toast("Текст сообщения скопирован — вставь его в чат");
+    };
     const ol = $("#ownerLink"); if (ol) ol.onclick = () => openProfile(car.owner_id);
   }
 }
@@ -788,6 +869,7 @@ function openEditor(car, opt={}){
         <div class="field"><label for="c_tr">КПП</label><select id="c_tr">${["","Автомат","Механика","Робот","Вариатор"].map(o=>`<option ${car?.transmission===o?"selected":""}>${o}</option>`).join("")}</select></div></div>
       <div class="grid2"><div class="field"><label for="c_dr">Привод</label><select id="c_dr">${["","Полный","Задний","Передний"].map(o=>`<option ${car?.drive===o?"selected":""}>${o}</option>`).join("")}</select></div>
         ${fld("c_body","Кузов",car?.body,'placeholder="Внедорожник"')}</div>
+      ${fld("c_city","Город, где стоит машина",car ? car.city : (S.me?.city || ""),'placeholder="Махачкала"')}
       <div class="grid2">${fld("c_col","Цвет",car?.color,'placeholder="Чёрный"')}${fld("c_vin","VIN",car?.vin,'class="num" maxlength="17" autocapitalize="characters"')}</div>
       <div class="field"><label for="c_desc">Описание (видно в публикации)</label><textarea id="c_desc" placeholder="Состояние, комплектация, история, что сделано">${val(car?.description)}</textarea></div>
     </section>
@@ -850,7 +932,7 @@ function openEditor(car, opt={}){
       make: $("#c_make").value.trim(), model: $("#c_model").value.trim(),
       year: intOrNull($("#c_year").value), mileage: intOrNull($("#c_mil").value),
       engine: $("#c_eng").value.trim()||null, transmission: $("#c_tr").value||null, drive: $("#c_dr").value||null,
-      body: $("#c_body").value.trim()||null, color: $("#c_col").value.trim()||null, vin: $("#c_vin").value.trim().toUpperCase()||null,
+      body: $("#c_body").value.trim()||null, city: $("#c_city").value.trim()||null, color: $("#c_col").value.trim()||null, vin: $("#c_vin").value.trim().toUpperCase()||null,
       list_price: numOrNull($("#c_list").value), description: $("#c_desc").value.trim()||null,
     };
     const fin = {
