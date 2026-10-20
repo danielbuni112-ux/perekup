@@ -183,6 +183,41 @@ main .wrap{padding-block:16px;display:flex;flex-direction:column;gap:14px}
 .fbtn .dot{display:inline-block;min-width:18px;height:18px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:11px;line-height:18px;margin-left:6px;font-family:var(--mono)}
 .count{font-size:13px;color:var(--muted)}
 .more{align-self:center}
+/* Chats */
+.tab{position:relative}
+.badge{position:absolute;top:3px;left:calc(50% + 5px);min-width:17px;height:17px;border-radius:9px;background:var(--bad);color:#fff;font:600 10px/17px var(--mono);padding:0 4px}
+.chatrow{display:flex;gap:12px;align-items:center;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:none;width:100%;text-align:left;color:inherit}
+.chatrow .m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.chatrow .top{display:flex;gap:8px;align-items:baseline}
+.chatrow .nm{font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chatrow .tm{font-size:12px;color:var(--muted);flex:none}
+.chatrow .car{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;padding:0;border:0;grid-template-columns:none}
+.chatrow .lm{font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chatrow.unread .lm{color:var(--ink)}
+.udot{width:9px;height:9px;border-radius:50%;background:var(--ink);flex:none}
+.sheet.chat{display:flex;flex-direction:column;overflow:hidden}
+.sheet.chat[hidden]{display:none!important}
+.carstrip{display:flex;gap:10px;align-items:center;border:0;background:var(--surface);color:inherit;border-radius:12px;padding:8px;text-align:left;width:100%}
+.carstrip .th{width:44px;height:44px;border-radius:8px;background:var(--sunk);overflow:hidden;display:grid;place-items:center;flex:none}
+.carstrip .th img{width:100%;height:100%;object-fit:cover}
+.carstrip .th svg{width:26px;height:26px;color:#3a3d44}
+.carstrip .m{flex:1;min-width:0}
+.carstrip b{display:block;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:6px;padding-block:12px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.msgs .inner{max-width:560px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.bubble{max-width:82%;padding:8px 12px 6px;border-radius:16px 16px 16px 4px;background:var(--surface);align-self:flex-start;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}
+.bubble.me{align-self:flex-end;background:#2a2d33;border-radius:16px 16px 4px 16px}
+.bubble time{display:block;font-size:10.5px;color:var(--muted);text-align:right;margin-top:2px;font-family:var(--mono)}
+.daysep{align-self:center;font-size:12px;color:var(--muted);padding:8px 0 2px}
+.composer{border-top:1px solid var(--line);background:var(--bg);padding-top:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.composer form{max-width:560px;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
+.composer textarea{flex:1;min-width:0;border:0;background:var(--sunk);border-radius:20px;padding:10px 14px;font-size:16px;line-height:1.35;resize:none;max-height:120px;min-height:42px}
+.send{width:42px;height:42px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);display:grid;place-items:center;flex:none}
+.send svg{width:20px;height:20px}
+.send[disabled]{opacity:.4}
+.quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;max-width:560px;margin:0 auto 8px}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:none;border:0;background:var(--sunk);color:var(--ink);border-radius:999px;padding:7px 12px;font-size:13px}
 /* People */
 .person{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:10px 0}
 .ava{width:44px;height:44px;border-radius:50%;background:var(--sunk);color:var(--ink);display:grid;place-items:center;font:500 17px var(--display);flex:none}
@@ -261,6 +296,8 @@ const I = {
   feed:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg>',
   people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.4 3.4-5 6.5-5s5.7 1.6 6.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.3 0 4 1.2 4.5 3.5"/></svg>',
   grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M20 20l-5-5"/><path d="M8 10.5h5"/></svg>',
+  chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+  sendI:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
   me:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l4-5 3 3 5-6"/></svg>',
   plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
@@ -270,7 +307,7 @@ const I = {
   lock:'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
 };
 
-const S = { user:null, me:null, tab:"garage", filter:"in_stock", cars:[], following:new Set(), cat:{ q:"", min:"", max:"", year:"", city:"", sort:"new", sold:false }, catOpen:false };
+const S = { user:null, me:null, tab:"garage", filter:"in_stock", cars:[], following:new Set(), convs:[], unread:0, feedMode:"follow", cat:{ q:"", min:"", max:"", year:"", city:"", sort:"new", sold:false }, catOpen:false };
 
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.hidden=false; clearTimeout(t._h); t._h=setTimeout(()=>t.hidden=true,2400); }
 function fail(e){ console.error(e); toast(e?.message ? "Ошибка: " + e.message : "Что-то пошло не так, попробуй ещё раз"); }
@@ -356,6 +393,8 @@ async function bootTelegram(){
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.user) ensureSession().catch(console.error); });
 
 async function openFromHash(){
+  const c = (location.hash || "").match(/^#c-([0-9a-f-]{36})$/i);
+  if (c) return openChat(c[1]);
   const m = (location.hash || "").match(/^#u-([a-z0-9_]{3,24})$/i) || String(TG?.initDataUnsafe?.start_param||"").match(/^u_([a-z0-9_]{3,24})$/i);
   if (!m) return;
   const { data } = await sb.from("profiles").select("id").eq("username", m[1].toLowerCase()).maybeSingle();
@@ -421,8 +460,9 @@ function renderAuth(mode="login", err=""){
 }
 
 // ---------- shell ----------
-const TABS = [["garage","Гараж",I.garage],["catalog","Каталог",I.grid],["feed","Лента",I.feed],["people","Люди",I.people],["me","Итоги",I.me]];
+const TABS = [["garage","Гараж",I.garage],["catalog","Каталог",I.grid],["feed","Лента",I.feed],["chats","Чаты",I.chat],["me","Итоги",I.me]];
 function renderShell(){
+  setTimeout(() => { loadConvs(); subscribeConvs(); }, 0);
   $("#app").innerHTML = `
     <header class="topbar"><div class="wrap"><h1 id="title"></h1><span id="topAct"></span></div></header>
     <main><div class="wrap" id="view"></div></main>
@@ -437,7 +477,8 @@ function renderTab(){
   document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-current", b.dataset.tab===S.tab ? "page" : "false"));
   $("#fab").hidden = S.tab !== "garage";
   $("#topAct").innerHTML = "";
-  ({garage:viewGarage, catalog:viewCatalog, feed:viewFeed, people:viewPeople, me:viewMe})[S.tab]();
+  ({garage:viewGarage, catalog:viewCatalog, feed:viewFeed, people:viewPeople, chats:viewChats, me:viewMe})[S.tab]();
+  updateBadge();
 }
 
 async function loadMyCars(){
@@ -506,9 +547,11 @@ async function viewGarage(){
 async function viewFeed(){
   $("#title").textContent = "Лента";
   const v = $("#view");
-  v.innerHTML = `
+  if (S.feedMode === "people") { v.innerHTML = feedToggle() + `<div id="pbox" style="display:flex;flex-direction:column;gap:14px"></div>`; bindFeedToggle(); return peopleInto($("#pbox")); }
+  v.innerHTML = feedToggle() + `
     <div id="fl" style="display:flex;flex-direction:column"><div class="loading">Загрузка…</div></div>`;
-  if (!S.following.size) { $("#fl").innerHTML = `<div class="empty"><b>Ты ни на кого не подписан</b>Здесь появляются машины перекупов, на которых ты подписан. Найди их в каталоге или во вкладке «Люди».<button class="btn small" id="goCat">Открыть каталог</button></div>`; $("#goCat").onclick=()=>{S.tab="catalog";renderTab();}; return; }
+  bindFeedToggle();
+  if (!S.following.size) { $("#fl").innerHTML = `<div class="empty"><b>Ты ни на кого не подписан</b>Здесь появляются машины перекупов, на которых ты подписан. Найди их в каталоге или в разделе «Люди» сверху.<button class="btn small" id="goCat">Открыть каталог</button></div>`; $("#goCat").onclick=()=>{S.tab="catalog";renderTab();}; return; }
   const q = sb.from("cars").select("*, profiles(username,display_name)").eq("visibility","public").in("owner_id", [...S.following]).order("created_at",{ascending:false}).limit(60);
   const rid = S.rid;
   const { data, error } = await q;
@@ -516,6 +559,141 @@ async function viewFeed(){
   if (error) return fail(error);
   $("#fl").innerHTML = data.length ? data.map(c=>carCard(c,{who:true})).join("") : `<div class="empty"><b>Пока нет машин</b>Те, на кого ты подписан, ещё ничего не опубликовали.</div>`;
   $("#fl").querySelectorAll(".car").forEach(b => b.onclick = () => openCar(b.dataset.id));
+}
+
+// ---------- Chats ----------
+const CONV_SEL = "*, buyer:profiles!conversations_buyer_id_fkey(id,username,display_name), seller:profiles!conversations_seller_id_fkey(id,username,display_name), cars(id,make,model,year,photos,list_price,status)";
+const isUnread = c => c.last_message_at && c.last_sender_id !== S.user.id && new Date(c.last_message_at) > new Date(c.buyer_id === S.user.id ? c.buyer_read_at : c.seller_read_at);
+const other = c => c.buyer_id === S.user.id ? c.seller : c.buyer;
+function updateBadge(){
+  const t = document.querySelector('.tab[data-tab="chats"]'); if (!t) return;
+  t.querySelector(".badge")?.remove();
+  if (S.unread) t.insertAdjacentHTML("beforeend", `<span class="badge">${S.unread > 99 ? "99+" : S.unread}</span>`);
+}
+async function loadConvs(){
+  const { data, error } = await sb.from("conversations").select(CONV_SEL).not("last_message_at","is",null).order("last_message_at",{ascending:false}).limit(100);
+  if (error) { console.error(error); return; }
+  S.convs = data || [];
+  S.unread = S.convs.filter(isUnread).length;
+  updateBadge();
+}
+let convChannel = null;
+function subscribeConvs(){
+  if (convChannel) return;
+  let t;
+  convChannel = sb.channel("convs-" + S.user.id)
+    .on("postgres_changes", { event:"*", schema:"public", table:"conversations" }, () => {
+      clearTimeout(t); t = setTimeout(async () => { await loadConvs(); if (S.tab === "chats" && $("#chl")) drawChatList(); }, 250);
+    }).subscribe();
+}
+const hhmm = d => new Date(d).toLocaleTimeString("ru-RU", { hour:"2-digit", minute:"2-digit" });
+function when(d){
+  const x = new Date(d), now = new Date();
+  if (x.toDateString() === now.toDateString()) return hhmm(d);
+  const y = new Date(now); y.setDate(now.getDate() - 1);
+  if (x.toDateString() === y.toDateString()) return "вчера";
+  return x.toLocaleDateString("ru-RU", { day:"numeric", month:"short" });
+}
+async function viewChats(){
+  $("#title").textContent = "Чаты";
+  $("#view").innerHTML = `<div id="chl" style="display:flex;flex-direction:column"><div class="loading">Загрузка…</div></div>`;
+  const rid = S.rid; await loadConvs(); if (rid !== S.rid) return;
+  drawChatList();
+}
+function drawChatList(){
+  const box = $("#chl"); if (!box) return;
+  if (!S.convs.length) { box.innerHTML = `<div class="empty"><b>Пока нет переписок</b>Найди машину в каталоге и нажми «Написать продавцу». Когда тебе напишут по твоей машине, чат появится здесь, а бот пришлёт уведомление.<button class="btn small" id="goCat2">Открыть каталог</button></div>`; $("#goCat2").onclick = () => { S.tab = "catalog"; renderTab(); }; return; }
+  box.innerHTML = S.convs.map(c => {
+    const o = other(c) || {}, u = isUnread(c), mine = c.last_sender_id === S.user.id;
+    const title = c.cars ? `${c.cars.make} ${c.cars.model}${c.cars.year ? ", " + c.cars.year : ""}` : (c.car_title || "Машина удалена");
+    const role = c.seller_id === S.user.id ? "покупатель" : "продавец";
+    return `<button class="chatrow ${u ? "unread" : ""}" data-c="${c.id}"><div class="ava">${esc(initial(o))}</div>
+      <div class="m"><div class="top"><span class="nm">${esc(o.display_name || o.username || "Пользователь")}</span><span class="tm">${when(c.last_message_at)}</span></div>
+      <span class="car">${esc(title)} · ${role}</span><span class="lm">${mine ? "Вы: " : ""}${esc(c.last_message || "")}</span></div>${u ? `<span class="udot" aria-label="Непрочитано"></span>` : ""}</button>`;
+  }).join("");
+  box.querySelectorAll("[data-c]").forEach(b => b.onclick = () => openChat(b.dataset.c));
+}
+
+async function startChat(car){
+  if (!await ensureSession()) return;
+  let { data } = await sb.from("conversations").select("id").eq("car_id", car.id).eq("buyer_id", S.user.id).maybeSingle();
+  if (!data) {
+    const title = `${car.make} ${car.model}${car.year ? " " + car.year : ""}`;
+    const r = await sb.from("conversations").insert({ car_id:car.id, buyer_id:S.user.id, seller_id:car.owner_id, car_title:title }).select("id").single();
+    if (r.error) {
+      const again = await sb.from("conversations").select("id").eq("car_id", car.id).eq("buyer_id", S.user.id).maybeSingle();
+      if (!again.data) return fail(r.error);
+      data = again.data;
+    } else data = r.data;
+  }
+  openChat(data.id, { fresh:true });
+}
+
+async function openChat(id, opt={}){
+  openSheet(`<div class="loading">Загрузка…</div>`, "chat");
+  const [{ data:c, error }, { data:msgs }] = await Promise.all([
+    sb.from("conversations").select(CONV_SEL).eq("id", id).single(),
+    sb.from("messages").select("*").eq("conversation_id", id).order("created_at",{ascending:true}).limit(500),
+  ]);
+  if (error || !c) { closeSheet(); return toast("Чат не найден"); }
+  const o = other(c) || {};
+  const car = c.cars;
+  const iAmBuyer = c.buyer_id === S.user.id;
+  const seen = new Set();
+  openSheet(`
+    <header class="topbar" style="position:static"><div class="wrap" style="padding-block:8px"><button class="iconbtn" data-close aria-label="Назад">${I.back}</button>
+      <h1 style="font-size:16px"><button class="link" id="chUser" style="padding:0;color:var(--ink);font:inherit;text-align:left">${esc(o.display_name || o.username || "Пользователь")}</button><div style="font:400 12px var(--body);color:var(--muted);margin-top:2px">@${esc(o.username || "")} · ${iAmBuyer ? "продавец" : "покупатель"}</div></h1></div>
+      <div class="wrap" style="padding-bottom:8px">${car ? `<button class="carstrip" id="chCar"><div class="th">${car.photos?.[0] ? `<img src="${esc(car.photos[0])}" alt="">` : I.car}</div><div class="m"><b>${esc(car.make)} ${esc(car.model)}${car.year ? ", " + car.year : ""}</b><span class="num" style="font-size:13px;color:var(--muted)">${money(car.list_price)}${car.status !== "in_stock" ? " · " + STATUS[car.status] : ""}</span></div></button>` : `<div class="hint">${esc(c.car_title || "Машина")} больше не опубликована</div>`}</div></header>
+    <div class="msgs" id="msgs"><div class="inner" id="msgIn"></div></div>
+    <div class="composer">
+      ${opt.fresh && !(msgs||[]).length ? `<div class="quick" id="quick">${["Здравствуйте! Машина ещё продаётся?","Какой реальный пробег?","Торг возможен?","Можно посмотреть сегодня?"].map(q=>`<button type="button">${q}</button>`).join("")}</div>` : ""}
+      <form id="sendForm"><textarea id="msgText" rows="1" placeholder="Сообщение" aria-label="Сообщение" maxlength="2000"></textarea><button class="send" id="sendBtn" aria-label="Отправить" disabled>${I.sendI}</button></form>
+    </div>`, "chat");
+
+  const inner = $("#msgIn"), box = $("#msgs");
+  let lastDay = "";
+  const add = (m, scroll=true) => {
+    if (seen.has(m.id)) return; seen.add(m.id);
+    const day = new Date(m.created_at).toDateString();
+    if (day !== lastDay) { lastDay = day; inner.insertAdjacentHTML("beforeend", `<div class="daysep">${new Date(m.created_at).toLocaleDateString("ru-RU",{day:"numeric",month:"long"})}</div>`); }
+    inner.insertAdjacentHTML("beforeend", `<div class="bubble ${m.sender_id === S.user.id ? "me" : ""}">${esc(m.body)}<time>${hhmm(m.created_at)}</time></div>`);
+    if (scroll) box.scrollTop = box.scrollHeight;
+  };
+  if (!(msgs||[]).length) inner.innerHTML = `<div class="empty" style="padding:24px 8px" id="chEmpty">${iAmBuyer ? "Напиши продавцу: спроси про машину, торг или время просмотра. Он получит уведомление в Telegram." : "Сообщений пока нет."}</div>`;
+  (msgs||[]).forEach(m => add(m, false));
+  box.scrollTop = box.scrollHeight;
+  sb.rpc("mark_read", { conv:id }).then(loadConvs);
+
+  const ch = sb.channel("msgs-" + id)
+    .on("postgres_changes", { event:"INSERT", schema:"public", table:"messages", filter:`conversation_id=eq.${id}` }, p => {
+      $("#chEmpty")?.remove(); add(p.new);
+      if (p.new.sender_id !== S.user.id) { sb.rpc("mark_read", { conv:id }); try { TG?.HapticFeedback?.notificationOccurred("success"); } catch {} }
+    }).subscribe();
+  S.onSheetClose = () => { sb.removeChannel(ch); loadConvs(); };
+
+  const ta = $("#msgText"), btn = $("#sendBtn");
+  const grow = () => { ta.style.height = "auto"; ta.style.height = Math.min(120, ta.scrollHeight) + "px"; btn.disabled = !ta.value.trim(); };
+  ta.oninput = grow;
+  ta.onkeydown = e => { if (e.key === "Enter" && !e.shiftKey && !/Mobi|iPhone|Android/i.test(navigator.userAgent)) { e.preventDefault(); $("#sendForm").requestSubmit(); } };
+  $("#quick")?.querySelectorAll("button").forEach(b => b.onclick = () => { ta.value = b.textContent; grow(); ta.focus(); });
+  $("#chUser").onclick = () => openProfile(o.id);
+  $("#chCar")?.addEventListener("click", () => openCar(car.id));
+  $("#sendForm").onsubmit = async e => {
+    e.preventDefault();
+    const body = ta.value.trim(); if (!body) return;
+    btn.disabled = true;
+    if (!await ensureSession()) { btn.disabled = false; return; }
+    const { data:m, error } = await sb.from("messages").insert({ conversation_id:id, sender_id:S.user.id, body }).select().single();
+    if (error) { btn.disabled = false; return fail(error); }
+    ta.value = ""; grow(); $("#quick")?.remove(); $("#chEmpty")?.remove(); add(m);
+    notify(m.id);
+  };
+}
+async function notify(messageId){
+  try {
+    const { data:{ session } } = await sb.auth.getSession();
+    fetch(SB_URL + "/functions/v1/tg-notify", { method:"POST", headers:{ "Content-Type":"application/json", apikey:SB_KEY, Authorization:"Bearer " + session.access_token }, body: JSON.stringify({ message_id: messageId }) }).catch(()=>{});
+  } catch {}
 }
 
 // ---------- Catalog ----------
@@ -585,9 +763,10 @@ async function loadCatalog(offset){
 function plural(n, f){ const a = n % 100, b = n % 10; return a > 10 && a < 20 ? f[2] : b === 1 ? f[0] : b >= 2 && b <= 4 ? f[1] : f[2]; }
 
 // ---------- People ----------
-async function viewPeople(){
-  $("#title").textContent = "Люди";
-  const v = $("#view");
+function feedToggle(){ return `<div class="toggle"><button data-m="follow" aria-pressed="${S.feedMode==="follow"}">Подписки</button><button data-m="people" aria-pressed="${S.feedMode==="people"}">Люди</button></div>`; }
+function bindFeedToggle(){ $("#view").querySelectorAll("[data-m]").forEach(b => b.onclick = () => { S.feedMode = b.dataset.m; viewFeed(); }); }
+async function viewPeople(){ S.tab = "feed"; S.feedMode = "people"; renderTab(); }
+async function peopleInto(v){
   v.innerHTML = `<div class="search">${I.search}<input id="pq" type="search" placeholder="Поиск по нику или имени" autocomplete="off"></div><div id="pl" style="display:flex;flex-direction:column"></div>`;
   const run = async () => {
     const q = $("#pq").value.trim().replace(/[%,()]/g,"");
@@ -692,8 +871,8 @@ function editProfile(){
 }
 
 // ---------- Sheet ----------
-function openSheet(html){ if (IN_TG) TG.BackButton.show(); const s=$("#sheet"); s.innerHTML=html; s.hidden=false; s.scrollTop=0; document.body.style.overflow="hidden"; s.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeSheet); }
-function closeSheet(){ if (IN_TG) TG.BackButton.hide(); const s=$("#sheet"); const wasOpen = !s.hidden; s.hidden=true; s.innerHTML=""; document.body.style.overflow=""; if (wasOpen && S.user && $("#view")) renderTab(); }
+function openSheet(html, cls=""){ if (IN_TG) TG.BackButton.show(); S.onSheetClose?.(); S.onSheetClose = null; const s=$("#sheet"); s.className = "sheet " + cls; s.innerHTML=html; s.hidden=false; s.scrollTop=0; document.body.style.overflow="hidden"; s.querySelectorAll("[data-close]").forEach(b=>b.onclick=closeSheet); }
+function closeSheet(){ if (IN_TG) TG.BackButton.hide(); S.onSheetClose?.(); S.onSheetClose = null; const s=$("#sheet"); s.className = "sheet"; const wasOpen = !s.hidden; s.hidden=true; s.innerHTML=""; document.body.style.overflow=""; if (wasOpen && S.user && $("#view")) renderTab(); }
 
 // ---------- Repairs block (shared by card and editor) ----------
 function mountRepairs(root, exps, { onAdd, onDel }){
@@ -774,7 +953,8 @@ function renderCar(car, own){
     <section class="sect"><div class="ph-head" style="gap:10px"><div class="ava" style="width:44px;height:44px;font-size:17px;border-radius:12px">${esc(initial(car.profiles))}</div>
       <div style="flex:1;min-width:0"><b>${esc(car.profiles?.display_name||car.profiles?.username)}</b><div class="u">@${esc(car.profiles?.username)}</div></div>
       <button class="btn small ${S.following.has(car.owner_id)?"ghost":""}" id="flw">${S.following.has(car.owner_id)?"Вы подписаны":"Подписаться"}</button></div>
-      ${car.profiles?.tg_username ? `<button class="btn" id="contact" style="width:100%">Написать продавцу в Telegram</button>` : `<p class="hint" style="margin:0">Продавец не указал Telegram для связи.</p>`}</section>`}
+      <button class="btn" id="chatSeller" style="width:100%">Написать продавцу</button>
+      ${car.profiles?.tg_username ? `<button class="link" id="contact" style="align-self:center;padding:4px">или открыть его Telegram</button>` : ""}</section>`}
   </div>`);
   if (own) {
     $("#editCar").onclick = () => openEditor(car);
@@ -805,6 +985,7 @@ function renderCar(car, own){
     };
   } else {
     $("#flw").onclick = async () => { await toggleFollow(car.owner_id); renderCar(car, false); };
+    $("#chatSeller").onclick = () => startChat(car);
     const ct = $("#contact");
     if (ct) ct.onclick = () => {
       const url = `https://t.me/${car.profiles.tg_username}`;
