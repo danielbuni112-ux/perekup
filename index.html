@@ -222,7 +222,14 @@ main .wrap{padding-block:16px;display:flex;flex-direction:column;gap:14px}
 <script>
 const SB_URL = "https://qzhybltmqctwygnmnrgh.supabase.co";
 const SB_KEY = "sb_publishable_v3uRAnFgXzTEZMOD_TRVPg_N1dMced3";
-const sb = supabase.createClient(SB_URL, SB_KEY);
+// Session storage: memory first, localStorage as a bonus (Telegram's iOS webview may drop it).
+const MEM = {};
+const authStorage = {
+  getItem: k => { if (k in MEM) return MEM[k]; try { return localStorage.getItem(k); } catch { return null; } },
+  setItem: (k, v) => { MEM[k] = v; try { localStorage.setItem(k, v); } catch {} },
+  removeItem: k => { delete MEM[k]; try { localStorage.removeItem(k); } catch {} },
+};
+const sb = supabase.createClient(SB_URL, SB_KEY, { auth: { storage: authStorage, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
 const BOT_USERNAME = "perecoupbot";            // username бота без @, заполняется после создания бота
 const TG = window.Telegram?.WebApp;
 const IN_TG = !!(TG && TG.initData);
@@ -284,7 +291,36 @@ async function boot(){
   openFromHash();
 }
 let silentSignOut = false;
-sb.auth.onAuthStateChange((ev) => { if (ev === "SIGNED_OUT" && !silentSignOut && !IN_TG) { S.user=null; renderAuth(); } });
+sb.auth.onAuthStateChange((ev) => {
+  if (ev !== "SIGNED_OUT" || silentSignOut) return;
+  if (IN_TG) { tgLogin().catch(console.error); return; }
+  S.user=null; renderAuth();
+});
+
+// Telegram: exchange signed initData for a Supabase session.
+let tgLoginP = null;
+function tgLogin(){
+  if (tgLoginP) return tgLoginP;
+  tgLoginP = (async () => {
+    const r = await fetch(SB_URL + "/functions/v1/tg-auth", { method:"POST", headers:{ "Content-Type":"application/json", apikey:SB_KEY, Authorization:"Bearer " + SB_KEY }, body: JSON.stringify({ initData: TG.initData }) });
+    const j = await r.json();
+    if (!r.ok || !j.token_hash) throw new Error(j.error || "auth_failed");
+    let v = await sb.auth.verifyOtp({ token_hash: j.token_hash, type: "magiclink" });
+    if (v.error) v = await sb.auth.verifyOtp({ token_hash: j.token_hash, type: "email" });
+    if (v.error) throw v.error;
+    S.user = v.data.user;
+    return v.data.session;
+  })().finally(() => { tgLoginP = null; });
+  return tgLoginP;
+}
+// Call before any write: guarantees a live session for this user.
+async function ensureSession(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if (session && session.user?.id === S.user?.id && session.expires_at * 1000 > Date.now() + 30000) return true;
+  if (session) { const { data, error } = await sb.auth.refreshSession(); if (!error && data.session) return true; }
+  if (IN_TG) { await tgLogin(); return true; }
+  toast("Сессия истекла, войди снова"); renderAuth(); return false;
+}
 
 async function bootTelegram(){
   try { TG.ready(); TG.expand(); TG.setHeaderColor("#0c0d0f"); TG.setBackgroundColor("#0c0d0f"); TG.setBottomBarColor?.("#0c0d0f"); TG.disableVerticalSwipes?.(); } catch {}
@@ -298,19 +334,15 @@ async function bootTelegram(){
       if (S.me && Number(S.me.telegram_id) === Number(tgId)) { renderShell(); return openFromHash(); }
       silentSignOut = true; await sb.auth.signOut(); silentSignOut = false;
     }
-    const r = await fetch(SB_URL + "/functions/v1/tg-auth", { method:"POST", headers:{ "Content-Type":"application/json", apikey:SB_KEY, Authorization:"Bearer " + SB_KEY }, body: JSON.stringify({ initData: TG.initData }) });
-    const j = await r.json();
-    if (!r.ok || !j.token_hash) throw new Error(j.error || "auth_failed");
-    let v = await sb.auth.verifyOtp({ token_hash: j.token_hash, type: "magiclink" });
-    if (v.error) v = await sb.auth.verifyOtp({ token_hash: j.token_hash, type: "email" });
-    if (v.error) throw v.error;
-    S.user = v.data.user; await loadMe();
+    await tgLogin(); await loadMe();
     renderShell(); openFromHash();
   } catch (e) {
     console.error(e);
     $("#app").innerHTML = `<div class="wrap auth"><div class="brand"><h1>Не получилось войти</h1><p>Закрой приложение и открой его снова из бота. Если не помогло, напиши разработчику: ${esc(e.message||e)}</p></div></div>`;
   }
 }
+
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.user) ensureSession().catch(console.error); });
 
 async function openFromHash(){
   const m = (location.hash || "").match(/^#u-([a-z0-9_]{3,24})$/i) || String(TG?.initDataUnsafe?.start_param||"").match(/^u_([a-z0-9_]{3,24})$/i);
@@ -514,6 +546,7 @@ function bindPeople(root){
 }
 async function toggleFollow(id){
   try {
+    if (!await ensureSession()) return;
     if (S.following.has(id)) { const { error } = await sb.from("follows").delete().eq("follower_id", S.user.id).eq("following_id", id); if (error) throw error; S.following.delete(id); }
     else { const { error } = await sb.from("follows").insert({ follower_id:S.user.id, following_id:id }); if (error) throw error; S.following.add(id); }
   } catch(e){ fail(e); }
@@ -579,6 +612,7 @@ function editProfile(){
     <button class="btn">Сохранить</button></form></div>`);
   $("#pf").onsubmit = async e => {
     e.preventDefault();
+    if (!await ensureSession()) return;
     const { error } = await sb.from("profiles").update({ username:$("#p_user").value.trim().toLowerCase(), display_name:$("#p_name").value.trim()||null, city:$("#p_city").value.trim()||null, bio:$("#p_bio").value.trim()||null }).eq("id", S.user.id);
     if (error) return toast(/duplicate|unique/i.test(error.message) ? "Этот ник уже занят" : "Не сохранилось: " + error.message);
     await loadMe(); closeSheet(); toast("Профиль сохранён"); renderTab();
@@ -613,6 +647,7 @@ function mountRepairs(root, exps, { onAdd, onDel }){
       const amount = numOrNull(root.querySelector(".r_amt").value);
       if (amount == null) { toast("Укажи сумму числом"); root.querySelector(".r_amt").focus(); return; }
       const e = { category:cat, title, amount, spent_at: root.querySelector(".r_date").value || null };
+      if (!await ensureSession()) return;
       const saved = await onAdd(e);
       if (saved === false) return;
       exps.push(saved || e); draw(); toast("Добавлено: " + money(amount));
@@ -673,6 +708,7 @@ function renderCar(car, own){
     $("#stSw").querySelectorAll("[data-st]").forEach(b => b.onclick = async () => {
       const st = b.dataset.st;
       if (st === "sold" && one(car.car_finance)?.sale_price == null) { openEditor(car, { focusSale:true, status:"sold" }); return; }
+      if (!await ensureSession()) return;
       const { error } = await sb.from("cars").update({ status:st }).eq("id", car.id);
       if (error) return fail(error);
       toast("Статус: " + STATUS[st]); openCar(car.id);
@@ -686,6 +722,7 @@ function renderCar(car, own){
       $("#delZone").innerHTML = `<div class="confirm"><span>Удалить ${esc(car.make)} ${esc(car.model)} со всеми расходами?</span><button class="btn small ghost" id="noDel">Отмена</button><button class="btn small danger" id="yesDel">Удалить</button></div>`;
       $("#noDel").onclick = () => renderCar(car, own);
       $("#yesDel").onclick = async () => {
+        if (!await ensureSession()) return;
         const { error } = await sb.from("cars").delete().eq("id", car.id);
         if (error) return fail(error);
         const paths = (car.photos||[]).map(u => u.split("/car-photos/")[1]).filter(Boolean);
@@ -779,6 +816,7 @@ function openEditor(car, opt={}){
     $("#phs").querySelectorAll("[data-rm]").forEach(b => b.onclick = () => { st.photos.splice(+b.dataset.rm,1); drawPhotos(); });
     $("#c_files").onchange = async e => {
       const files = [...e.target.files]; if (!files.length) return;
+      if (!await ensureSession()) return;
       toast(`Загружаю фото: ${files.length}…`);
       for (const file of files) {
         const blob = await compress(file);
@@ -805,6 +843,7 @@ function openEditor(car, opt={}){
   $("#carForm").onsubmit = async e => {
     e.preventDefault();
     const btn = $("#saveCar"); btn.disabled = true;
+    if (!await ensureSession()) { btn.disabled = false; return; }
     const intOrNull = v => { const n = numOrNull(v); return n==null ? null : Math.round(n); };
     const row = {
       photos: st.photos, status: st.status, visibility: st.visibility,
